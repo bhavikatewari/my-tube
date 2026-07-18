@@ -64,7 +64,7 @@ function HomeFeed() {
           </p>
         </div>
         {!query && (
-          <Button render={<Link href="/upload" />} className="gap-2">
+          <Button render={<Link href="/upload" />} nativeButton={false} className="gap-2">
             <Upload className="size-4" />
             Upload a video
           </Button>

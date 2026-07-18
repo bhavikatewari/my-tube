@@ -62,7 +62,7 @@ export function SiteHeader() {
       </Suspense>
 
       <div className="flex items-center gap-2">
-        <Button render={<Link href="/upload" />} variant="ghost" size="sm" className="gap-2">
+        <Button render={<Link href="/upload" />} nativeButton={false} variant="ghost" size="sm" className="gap-2">
           <Upload className="size-5" />
           <span className="hidden sm:inline">Upload</span>
         </Button>
@@ -77,7 +77,7 @@ export function SiteHeader() {
             </Button>
           </div>
         ) : (
-          <Button render={<Link href="/auth" />} size="sm">
+          <Button render={<Link href="/auth" />} nativeButton={false} size="sm">
             Sign in
           </Button>
         )}

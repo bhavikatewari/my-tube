@@ -128,7 +128,7 @@ export default function UploadPage() {
               </>
             )}
           </Button>
-          <Button render={<Link href="/" />} type="button" variant="ghost">
+          <Button render={<Link href="/" />} nativeButton={false} type="button" variant="ghost">
             Cancel
           </Button>
         </div>

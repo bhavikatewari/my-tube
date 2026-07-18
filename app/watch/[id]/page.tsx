@@ -7,6 +7,8 @@ import { ArrowLeft, VideoOff } from "lucide-react"
 import { fetchVideo, fetchVideos, resolveVideoSrc, type ApiVideo } from "@/lib/api"
 import { VideoCard } from "@/components/video-card"
 import { Button } from "@/components/ui/button"
+import { LikeButton } from "@/components/like-button"
+import { CommentsSection } from "@/components/comments-section"
 
 function uploaderName(v: ApiVideo): string {
   const u = v.user ?? v.uploader
@@ -42,7 +44,7 @@ export default function WatchPage({
       <main className="mx-auto flex w-full max-w-[1600px] flex-col items-center gap-4 px-4 py-24 text-center">
         <VideoOff className="size-10 text-muted-foreground" />
         <p className="text-sm text-muted-foreground">This video could not be loaded.</p>
-        <Button render={<Link href="/" />} variant="secondary">
+        <Button render={<Link href="/" />} nativeButton={false} variant="secondary">
           Back to home
         </Button>
       </main>
@@ -55,7 +57,7 @@ export default function WatchPage({
 
   return (
     <main className="mx-auto w-full max-w-[1600px] px-4 py-6">
-      <Button render={<Link href="/" />} variant="ghost" size="sm" className="mb-4 gap-2">
+      <Button render={<Link href="/" />} nativeButton={false} variant="ghost" size="sm" className="mb-4 gap-2">
         <ArrowLeft className="size-4" />
         Back
       </Button>
@@ -74,16 +76,19 @@ export default function WatchPage({
 
           <h1 className="mt-4 text-xl font-semibold text-pretty">{video.title}</h1>
 
-          <div className="mt-3 flex items-center gap-3 border-b border-border pb-4">
-            <div className="flex size-10 items-center justify-center rounded-full bg-primary text-base font-semibold text-primary-foreground">
-              {initial}
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
+            <div className="flex items-center gap-3">
+              <div className="flex size-10 items-center justify-center rounded-full bg-primary text-base font-semibold text-primary-foreground">
+                {initial}
+              </div>
+              <div>
+                <p className="font-medium">{uploaderName(video)}</p>
+                {typeof video.views === "number" && (
+                  <p className="text-xs text-muted-foreground">{video.views} views</p>
+                )}
+              </div>
             </div>
-            <div>
-              <p className="font-medium">{uploaderName(video)}</p>
-              {typeof video.views === "number" && (
-                <p className="text-xs text-muted-foreground">{video.views} views</p>
-              )}
-            </div>
+            <LikeButton videoId={video._id} />
           </div>
 
           {video.description && (
@@ -93,6 +98,8 @@ export default function WatchPage({
               </p>
             </div>
           )}
+
+          <CommentsSection videoId={video._id} />
         </div>
 
         <aside className="w-full shrink-0 lg:w-96">
