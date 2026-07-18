@@ -1,47 +1,93 @@
+"use client"
+
+import { useSearchParams } from "next/navigation"
+import { Suspense } from "react"
+import useSWR from "swr"
+import Link from "next/link"
+import { Upload, VideoOff } from "lucide-react"
+import { fetchVideos, type ApiVideo } from "@/lib/api"
+import { VideoCard } from "@/components/video-card"
+import { Button } from "@/components/ui/button"
+
+function HomeFeed() {
+  const params = useSearchParams()
+  const query = (params.get("q") ?? "").toLowerCase()
+  const { data, error, isLoading } = useSWR<ApiVideo[]>("videos", fetchVideos, {
+    revalidateOnFocus: false,
+  })
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div key={i} className="flex flex-col gap-3">
+            <div className="aspect-video w-full animate-pulse rounded-xl bg-secondary" />
+            <div className="flex gap-3">
+              <div className="size-9 shrink-0 animate-pulse rounded-full bg-secondary" />
+              <div className="flex-1 space-y-2">
+                <div className="h-3 w-4/5 animate-pulse rounded bg-secondary" />
+                <div className="h-3 w-2/5 animate-pulse rounded bg-secondary" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center gap-3 py-24 text-center">
+        <VideoOff className="size-10 text-muted-foreground" />
+        <p className="text-sm text-muted-foreground">
+          {"Couldn't reach the backend. It may be waking up — try again in a moment."}
+        </p>
+      </div>
+    )
+  }
+
+  const videos = data ?? []
+  const filtered = query
+    ? videos.filter((v) => v.title?.toLowerCase().includes(query))
+    : videos
+
+  if (filtered.length === 0) {
+    return (
+      <div className="flex flex-col items-center gap-4 py-24 text-center">
+        <VideoOff className="size-10 text-muted-foreground" />
+        <div>
+          <p className="font-medium">
+            {query ? `No videos match "${query}"` : "No videos yet"}
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {query ? "Try a different search." : "Be the first to upload one."}
+          </p>
+        </div>
+        {!query && (
+          <Button render={<Link href="/upload" />} className="gap-2">
+            <Upload className="size-4" />
+            Upload a video
+          </Button>
+        )}
+      </div>
+    )
+  }
+
+  return (
+    <div className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {filtered.map((video) => (
+        <VideoCard key={video._id} video={video} />
+      ))}
+    </div>
+  )
+}
+
 export default function Page() {
   return (
-    <main
-      style={{
-        colorScheme: 'light dark',
-        position: 'relative',
-        display: 'flex',
-        minHeight: '100vh',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'light-dark(#fff, #000)',
-        color: 'light-dark(#000, #fff)',
-      }}
-    >
-      <svg
-        aria-hidden="true"
-        style={{ width: 80, height: 80 }}
-        width={80}
-        height={80}
-        fill="none"
-        viewBox="0 0 20 20"
-        xmlns="http://www.w3.org/2000/svg"
-        stroke="currentColor"
-        strokeWidth="0.5"
-      >
-        <path
-          d="M14.2 14.2H17V6.9375C17 4.76288 15.2371 3 13.0625 3H5.8V5.8M14.2 14.2V7.79063L7.79062 14.2H14.2ZM14.2 14.2V17H6.9375C4.76288 17 3 15.2371 3 13.0625V5.8H5.8M5.8 5.8V12.2313L12.2313 5.8H5.8Z"
-          strokeLinejoin="round"
-        />
-      </svg>
-      <p
-        style={{
-          position: 'absolute',
-          left: '50%',
-          top: 'calc(50% + 56px)',
-          transform: 'translateX(-50%)',
-          whiteSpace: 'nowrap',
-          fontSize: '14px',
-          fontWeight: 500,
-          color: 'light-dark(#71717a, #a1a1aa)',
-        }}
-      >
-        Your v0 generation will show here.
-      </p>
+    <main className="mx-auto w-full max-w-[1600px] px-4 py-6">
+      <Suspense fallback={null}>
+        <HomeFeed />
+      </Suspense>
     </main>
   )
 }
