@@ -67,7 +67,9 @@ export async function uploadVideo(
   form.append("video",params.file)
   const res=await fetch(`${API_BASE}/api/videos`,{
     method: "POST",
-    headers: authHeaders(token),   // <-- THIS LINE TO CHANGE
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
     body: form,
   })
 export async function fetchVideo(id: string): Promise<ApiVideo> {
