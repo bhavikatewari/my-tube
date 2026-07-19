@@ -57,7 +57,19 @@ export async function fetchVideos(): Promise<ApiVideo[]> {
   const res = await fetch(`${API_BASE}/api/videos`, { cache: "no-store" })
   return handle<ApiVideo[]>(res)
 }
-
+export async function uploadVideo(
+  params: {title: string;description: string;file: File},
+  token: string,
+): Promise<ApiVideo>{
+  const form=new FormData()
+  form.append("title",params.title)
+  form.append("description",params.description)
+  form.append("video",params.file)
+  const res=await fetch(`${API_BASE}/api/videos`,{
+    method: "POST",
+    headers: authHeaders(token),   // <-- THIS LINE TO CHANGE
+    body: form,
+  })
 export async function fetchVideo(id: string): Promise<ApiVideo> {
   const res = await fetch(`${API_BASE}/api/videos/${id}`, { cache: "no-store" })
   return handle<ApiVideo>(res)
